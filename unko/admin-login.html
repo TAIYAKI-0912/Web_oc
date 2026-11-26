@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理者ログイン | オープンキャンパス NAVI</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7f9;color:#10182d;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}header{height:67px;background:white;border-bottom:1px solid #e1e6ee;display:flex;align-items:center;justify-content:space-between;padding:0 15px;gap:8px}.brand{display:flex;align-items:center;gap:10px;font-weight:850;font-size:19px}.logo{width:39px;height:39px;background:#5035f5;border-radius:12px;display:grid;place-items:center;color:white;box-shadow:0 2px 4px #0002;flex-shrink:0}.tabs{display:flex;background:#f0f4f8;border:1px solid #dfe6ef;border-radius:13px;padding:3px;white-space:nowrap}.tabs a{padding:7px 12px;border-radius:9px;text-decoration:none;color:#64748b;font-weight:bold}.tabs .active{background:#5035f5;color:white}main{padding:82px 15px;display:flex;justify-content:center}.panel{width:100%;max-width:607px;background:white;border:1px solid #e0e6ee;border-radius:25px;box-shadow:0 2px 5px #0002;padding:24px}.back{display:inline-block;text-decoration:none;background:#eef3f7;border-radius:13px;color:#42566c;padding:6px 16px;font-weight:750}.intro{text-align:center;margin:18px 0 19px}.shield{margin:auto;width:60px;height:60px;border-radius:24px;background:#eef0ff;color:#5035f5;display:grid;place-items:center}h1{font-size:25px;margin:8px 0 7px;font-weight:850}.intro p{margin:0;color:#647d97;font-size:16px}.demo{background:#fff9e9;border:1px solid #ffda68;border-radius:19px;padding:15px;color:#914000;margin-bottom:18px}.demo-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.demo strong{font-size:17px}.demo button{background:white;border:1px solid #c9c9ff;color:#5035f5;border-radius:13px;padding:5px 15px;font-size:16px;font-weight:bold;cursor:pointer}.demo p{margin:8px 0 0}.demo code{font-weight:bold}label{display:block;font-weight:750;font-size:17px;margin:0 0 5px;color:#293d55}input{width:100%;border:1px solid #c6d1e1;border-radius:18px;height:56px;padding:0 18px;font:inherit;font-size:21px;color:#18243b;background:white;outline:none;margin-bottom:15px}input::placeholder{color:#8593a7}input:focus{border-color:#5035f5;box-shadow:0 0 0 3px #5035f518}.submit{width:100%;border:0;border-radius:18px;height:60px;background:#5035f5;color:white;font-size:21px;font-weight:800;cursor:pointer;box-shadow:0 2px 4px #0002}.submit:disabled{opacity:.65;cursor:wait}#status{font-size:14px;margin:12px 0 0;color:#b42318}#status:empty{display:none}@media(max-width:480px){header{padding:0 10px}.brand{font-size:14px;gap:7px}.tabs a{font-size:13px;padding:7px 8px}main{padding:32px 12px}.panel{padding:20px}.intro p{font-size:14px}.demo button{font-size:13px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="logo"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span>オープンキャンパス NAVI</div><nav class="tabs"><a href="/">高校生</a><a class="active" href="/staff">スタッフ</a></nav></header>
+<main><section class="panel"><a class="back" href="/staff">← スタッフ画面に戻る</a><div class="intro"><div class="shield"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6v6c0 5-4 8-8 10-4-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div><h1>管理者ログイン</h1><p>講座の追加・編集・削除を行うには管理者ログインが必要です</p></div>
+
+
+<form id="loginForm"><label for="email">メールアドレス</label><input id="email" type="email" placeholder="admin@school.jp" autocomplete="username" required><label for="password">パスワード</label><input id="password" type="password" placeholder="pass" autocomplete="current-password" required><button class="submit" id="submit" type="submit">管理者としてログイン</button><p id="status" role="status" aria-live="polite"></p></form></section></main>
+<script>
+const form = document.getElementById('loginForm');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const submit = document.getElementById('submit');
+const status = document.getElementById('status');
+document.getElementById('demoFill').onclick = () => { email.value='admin@school.jp'; password.value='pass'; };
+// Firebase コンソールの Web アプリ設定で置き換える。
+const firebaseConfig = { apiKey: 'YOUR_API_KEY', authDomain: 'YOUR_PROJECT_ID.firebaseapp.com', projectId: 'YOUR_PROJECT_ID', appId: 'YOUR_APP_ID' };
+let auth, sdk;
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  status.textContent='';
+  if(firebaseConfig.apiKey === 'YOUR_API_KEY') { status.textContent='Firebase未設定です。HTML内のfirebaseConfigを設定してください。'; return; }
+  submit.disabled=true; submit.textContent='ログイン中…';
+  try {
+    if(!auth){
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js');
+      sdk = await import('https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js');
+      auth = sdk.getAuth(initializeApp(firebaseConfig));
+    }
+    const result = await sdk.signInWithEmailAndPassword(auth,email.value.trim(),password.value);
+    const token = await result.user.getIdTokenResult(true);
+    if(token.claims.admin !== true){ await sdk.signOut(auth); status.textContent='管理者権限がありません。'; return; }
+    location.assign('/admin'); // 実際の管理画面URLに変更する
+  } catch(error){
+    status.textContent = error.code === 'auth/network-request-failed' ? '通信エラーが発生しました。' : 'ログインできませんでした。入力情報またはFirebase設定を確認してください。';
+    console.error(error.code || error.message);
+  } finally { submit.disabled=false; submit.textContent='管理者としてログイン'; }
+});
+</script>
+</body>
+</html>
